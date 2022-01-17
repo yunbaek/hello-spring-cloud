@@ -15,10 +15,10 @@ spring:
     gateway:
       routes:
         - id: first-service
-          uri: http://localhost:8081/
+          uri: http://localhost:8001/
           predicates:
             - Path=/first-service/**
         - id: second-service
-          uri: http://localhost:8082/
+          uri: http://localhost:8002/
           predicates:
             - Path=/second-service/**
