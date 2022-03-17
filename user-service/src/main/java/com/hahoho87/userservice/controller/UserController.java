@@ -1,24 +1,34 @@
 package com.hahoho87.userservice.controller;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.hahoho87.userservice.dto.UserDto;
+import com.hahoho87.userservice.dto.UserRequestDto;
+import com.hahoho87.userservice.service.UserService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/user")
 public class UserController {
 
-    @Value("${greeting.message}")
-    private String welcomeMessage;
+    private final UserService userService;
 
-    @GetMapping("/health_check")
-    public String healthCheck() {
-        return "It's Working in User Service";
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/welcome")
-    public String welcome() {
-        return welcomeMessage;
+    @PostMapping
+    public ResponseEntity createUser(@RequestBody UserRequestDto requestDto) {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        UserDto userDto = mapper.map(requestDto, UserDto.class);
+        userService.createUser(userDto);
+
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 }
