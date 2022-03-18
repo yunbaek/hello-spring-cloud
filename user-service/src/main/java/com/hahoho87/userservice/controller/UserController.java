@@ -2,6 +2,7 @@ package com.hahoho87.userservice.controller;
 
 import com.hahoho87.userservice.dto.UserDto;
 import com.hahoho87.userservice.dto.UserRequestDto;
+import com.hahoho87.userservice.dto.UserResponseDto;
 import com.hahoho87.userservice.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -23,12 +24,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity createUser(@RequestBody UserRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(requestDto, UserDto.class);
-        userService.createUser(userDto);
 
-        return ResponseEntity.ok(HttpStatus.CREATED);
+        userService.createUser(userDto);
+        UserResponseDto result = mapper.map(userDto, UserResponseDto.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 }
