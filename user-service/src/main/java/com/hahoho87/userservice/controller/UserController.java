@@ -8,24 +8,26 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/user-service/users")
 public class UserController {
 
     private final UserService userService;
+    private final ModelMapper mapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ModelMapper mapper) {
         this.userService = userService;
+        this.mapper = mapper;
     }
 
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto requestDto) {
-        ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(requestDto, UserDto.class);
 
@@ -33,5 +35,19 @@ public class UserController {
         UserResponseDto result = mapper.map(userDto, UserResponseDto.class);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> findAllUsers() {
+        List<UserDto> allUsers = userService.findAllUsers();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(allUsers.stream()
+                        .map(u -> mapper.map(u, UserResponseDto.class))
+                        .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/health-check")
+    public String status(HttpServletRequest request) {
+        return String.format("It's Working In User Service on Port %s", request.getServerPort());
     }
 }
