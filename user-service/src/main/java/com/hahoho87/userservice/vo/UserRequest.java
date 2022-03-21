@@ -1,4 +1,4 @@
-package com.hahoho87.userservice.dto;
+package com.hahoho87.userservice.vo;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-public class UserRequestDto {
+public class UserRequest {
 
     @NotNull(message = "Email cannot be null")
     @Size(min = 2, message = "Email not be less than two characters")
