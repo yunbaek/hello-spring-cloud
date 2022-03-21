@@ -1,5 +1,8 @@
 package com.hahoho87.userservice;
 
+import org.bouncycastle.math.raw.Mod;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -17,6 +20,12 @@ public class UserServiceApplication {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        new ModelMapper().getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return new ModelMapper();
     }
 
 }
