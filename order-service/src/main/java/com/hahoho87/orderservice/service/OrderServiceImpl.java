@@ -34,7 +34,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private int getTotalPrice(OrderDto dto) {
-        return dto.getUnitPrice() * dto.getQyt();
+        return dto.getUnitPrice() * dto.getQty();
     }
 
     @Override

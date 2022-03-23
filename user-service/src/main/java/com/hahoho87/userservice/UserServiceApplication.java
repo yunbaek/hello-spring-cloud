@@ -1,6 +1,5 @@
 package com.hahoho87.userservice;
 
-import org.bouncycastle.math.raw.Mod;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.SpringApplication;
@@ -24,8 +23,9 @@ public class UserServiceApplication {
 
     @Bean
     public ModelMapper modelMapper() {
-        new ModelMapper().getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper;
     }
 
 }

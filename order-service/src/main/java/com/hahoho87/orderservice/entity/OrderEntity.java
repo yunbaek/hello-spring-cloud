@@ -24,8 +24,6 @@ public class OrderEntity {
     @Column(nullable = false)
     private Integer totalPrice;
 
-    @Column(nullable = false)
-    private String userName;
     @Column(nullable = false, unique = true)
     private String orderId;
     @Column(nullable = false)
