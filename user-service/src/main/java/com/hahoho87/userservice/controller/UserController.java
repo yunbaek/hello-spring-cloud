@@ -26,7 +26,7 @@ public class UserController {
         this.mapper = mapper;
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest requestDto) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(requestDto, UserDto.class);
@@ -37,7 +37,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<UserResponse>> findAllUsers() {
         List<UserDto> allUsers = userService.findAllUsers();
         return ResponseEntity.status(HttpStatus.OK)
