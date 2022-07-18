@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hahoho87.userservice.dto.UserDto;
 import com.hahoho87.userservice.service.UserService;
 import com.hahoho87.userservice.vo.LoginRequest;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -54,7 +58,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
         String email = ((User) authResult.getPrincipal()).getUsername();
-        UserDto userDetailsByEmail = userService.getUserDetailsByEmail(email);
+        UserDto userDto = userService.getUserDetailsByEmail(email);
 
+        long expirationTime = Long.parseLong(Objects.requireNonNull(environment.getProperty("token.expiration_time")));
+
+        String token = Jwts.builder()
+                .setSubject(userDto.getUserId())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(SignatureAlgorithm.HS512, environment.getProperty("token.secret"))
+                .compact();
+
+        response.addHeader("token", token);
+        response.addHeader("userId", userDto.getUserId());
     }
 }
