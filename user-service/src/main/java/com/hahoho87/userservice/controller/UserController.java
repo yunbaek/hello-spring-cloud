@@ -6,6 +6,7 @@ import com.hahoho87.userservice.vo.UserRequest;
 import com.hahoho87.userservice.vo.UserResponse;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +21,12 @@ public class UserController {
 
     private final UserService userService;
     private final ModelMapper mapper;
+    private final Environment environment;
 
-    public UserController(UserService userService, ModelMapper mapper) {
+    public UserController(UserService userService, ModelMapper mapper, Environment environment) {
         this.userService = userService;
         this.mapper = mapper;
+        this.environment = environment;
     }
 
     @PostMapping
@@ -55,6 +58,14 @@ public class UserController {
 
     @GetMapping("/health-check")
     public String status(HttpServletRequest request) {
-        return String.format("It's Working In User Service on Port %s", request.getServerPort());
+        return String.format("It's Working In User Service"
+                        + ", Port(local.server.port) : %s "
+                        + ", Port(server.port) : %s "
+                        + ", with token secret : %s"
+                        + ", with token time : %s"
+                , environment.getProperty("local.server.port")
+                , environment.getProperty("server.port")
+                , environment.getProperty("token.secret")
+                , environment.getProperty("token.expiration_time"));
     }
 }
