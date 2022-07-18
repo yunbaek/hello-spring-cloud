@@ -1,8 +1,12 @@
 package com.hahoho87.userservice.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hahoho87.userservice.dto.UserDto;
+import com.hahoho87.userservice.service.UserService;
 import com.hahoho87.userservice.vo.LoginRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -19,6 +23,17 @@ import java.util.ArrayList;
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final UserService userService;
+    private final Environment environment;
+
+    public AuthenticationFilter(AuthenticationManager authenticationManager,
+                                UserService userService,
+                                Environment environment) {
+        super(authenticationManager);
+        this.userService = userService;
+        this.environment = environment;
+    }
+
     @Override
     public Authentication attemptAuthentication(
             HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -34,10 +49,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void successfulAuthentication(
-            HttpServletRequest request, HttpServletResponse response,
-            FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        log.debug("Username : {}, Password: {}", ((User) authResult.getPrincipal()).getUsername(), ((User) authResult.getPrincipal()).getPassword());
-//        super.successfulAuthentication(request, response, chain, authResult);
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
+        String email = ((User) authResult.getPrincipal()).getUsername();
+        UserDto userDetailsByEmail = userService.getUserDetailsByEmail(email);
+
     }
 }
