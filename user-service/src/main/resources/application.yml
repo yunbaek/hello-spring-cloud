@@ -33,7 +33,7 @@ logging:
 management:
   endpoints:
     web:
-      expsure:
+      exposure:
         include: refresh, health, beans
 
 #token:
