@@ -8,4 +8,4 @@ spring:
     config:
       server:
         git:
-          uri: file:///C:/workspace/hahoho87/hello-spring-cloud/git-local-repo
+          uri: https://github.com/hahoho87/hello-spring-cloud-config.git
