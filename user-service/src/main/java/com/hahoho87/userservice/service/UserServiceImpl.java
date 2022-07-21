@@ -6,6 +6,8 @@ import com.hahoho87.userservice.entity.UserEntity;
 import com.hahoho87.userservice.exception.UserNotFoundException;
 import com.hahoho87.userservice.repository.UserRepository;
 import com.hahoho87.userservice.vo.OrderResponse;
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
@@ -22,6 +24,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -76,7 +79,13 @@ public class UserServiceImpl implements UserService {
         */
 
         /* Using FeignClient to get orders of user */
-        List<OrderResponse> orderResponses = orderServiceClient.getOrders(userDto.getUserId());
+        /* Feign Exception Handling */
+        List<OrderResponse> orderResponses = null;
+        try {
+            orderResponses = orderServiceClient.getOrders(userDto.getUserId());
+        } catch (FeignException e) {
+            log.error("FeignException : {}", e.getMessage());
+        }
         userDto.setOrderResponses(orderResponses);
 
         return userDto;
