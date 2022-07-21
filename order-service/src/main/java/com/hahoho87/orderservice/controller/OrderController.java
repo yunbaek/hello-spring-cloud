@@ -25,7 +25,7 @@ public class OrderController {
         this.mapper = mapper;
     }
 
-    @GetMapping("health-check")
+    @GetMapping("/health-check")
     public String healthCheck() {
         return "It's Working in Order Service";
     }
