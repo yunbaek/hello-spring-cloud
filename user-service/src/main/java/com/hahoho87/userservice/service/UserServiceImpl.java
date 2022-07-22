@@ -6,10 +6,8 @@ import com.hahoho87.userservice.entity.UserEntity;
 import com.hahoho87.userservice.exception.UserNotFoundException;
 import com.hahoho87.userservice.repository.UserRepository;
 import com.hahoho87.userservice.vo.OrderResponse;
-import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,15 +28,13 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
-    private final Environment environment;
     private final OrderServiceClient orderServiceClient;
 
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
-                           ModelMapper mapper, Environment environment, OrderServiceClient orderServiceClient) {
+                           ModelMapper mapper, OrderServiceClient orderServiceClient) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
-        this.environment = environment;
         this.orderServiceClient = orderServiceClient;
     }
 
@@ -69,7 +65,7 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = mapper.map(userEntity, UserDto.class);
 
-        /* Using RestTemplate to get orders of user */
+        // Using RestTemplate to get orders of user
         /*
         String orderUrl = String.format(Objects.requireNonNull(environment.getProperty("order_service.url")), userDto.getUserId());
         List<OrderResponse> orderResponses =
@@ -78,14 +74,8 @@ public class UserServiceImpl implements UserService {
                         }).getBody();
         */
 
-        /* Using FeignClient to get orders of user */
-        /* Feign Exception Handling */
-        List<OrderResponse> orderResponses = null;
-        try {
-            orderResponses = orderServiceClient.getOrders(userDto.getUserId());
-        } catch (FeignException e) {
-            log.error("FeignException : {}", e.getMessage());
-        }
+        // Using FeignClient to get orders of user
+        List<OrderResponse> orderResponses = orderServiceClient.getOrders(userDto.getUserId());
         userDto.setOrderResponses(orderResponses);
 
         return userDto;

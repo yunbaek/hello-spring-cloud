@@ -1,5 +1,6 @@
 package com.hahoho87.userservice;
 
+import com.hahoho87.userservice.error.FeignErrorDecoder;
 import feign.Logger;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -42,5 +43,10 @@ public class UserServiceApplication {
     @Bean
     public Logger.Level feignLoggerLevel() {
         return Logger.Level.FULL;
+    }
+
+    @Bean
+    public FeignErrorDecoder feignErrorDecoder() {
+        return new FeignErrorDecoder();
     }
 }
