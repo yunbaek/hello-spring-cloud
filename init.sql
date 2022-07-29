@@ -1,20 +1,20 @@
-CREATE TABLE USERS
+create table users
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
-    user_id    VARCHAR(20),
-    pwd        varchaR(20),
-    name       VARCHAR(20),
-    created_at DATETIME DEFAULT NOW()
+    id         int auto_increment primary key,
+    user_id    varchar(20),
+    pwd        varchar(20),
+    name       varchar(20),
+    created_at datetime default now()
 );
 
-CREATE TABLE ORDERS
+create table orders
 (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    product_id  VARCHAR(20) NOT NULL,
-    qty         INT      DEFAULT 0,
-    unit_price  INT      DEFAULT 0,
-    total_price INT      DEFAULT 0,
-    user_id     VARCHAR(50) NOT NULL,
-    order_id    VARCHAR(50) NOT NULL,
-    created_at  DATETIME DEFAULT NOW()
+    id          int auto_increment primary key,
+    product_id  varchar(20) not null,
+    qty         int      default 0,
+    unit_price  int      default 0,
+    total_price int      default 0,
+    user_id     varchar(50) not null,
+    order_id    varchar(50) not null,
+    created_at  datetime default now()
 );
