@@ -2,6 +2,7 @@ package com.hahoho87.orderservice.controller;
 
 import com.hahoho87.orderservice.dto.OrderDto;
 import com.hahoho87.orderservice.entity.OrderEntity;
+import com.hahoho87.orderservice.messagequeue.KafkaProducer;
 import com.hahoho87.orderservice.service.OrderService;
 import com.hahoho87.orderservice.vo.OrderRequest;
 import com.hahoho87.orderservice.vo.OrderResponse;
@@ -19,10 +20,12 @@ public class OrderController {
 
     private final OrderService orderService;
     private final ModelMapper mapper;
+    private final KafkaProducer kafkaProducer;
 
-    public OrderController(OrderService orderService, ModelMapper mapper) {
+    public OrderController(OrderService orderService, ModelMapper mapper, KafkaProducer kafkaProducer) {
         this.orderService = orderService;
         this.mapper = mapper;
+        this.kafkaProducer = kafkaProducer;
     }
 
     @GetMapping("/health-check")
@@ -34,10 +37,11 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest order,
                                                      @PathVariable String userId) {
         OrderDto orderDto = getMap(order, OrderDto.class);
-
         orderDto.setUserId(userId);
         OrderDto createdOrder = orderService.createOrder(orderDto);
 
+        /* send order to the kafka */
+        kafkaProducer.send("example-catalog-topic", orderDto);
 
         OrderResponse result = getMap(createdOrder, OrderResponse.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
