@@ -8,6 +8,8 @@ import com.hahoho87.userservice.repository.UserRepository;
 import com.hahoho87.userservice.vo.OrderResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,13 +31,16 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
     private final OrderServiceClient orderServiceClient;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
-                           ModelMapper mapper, OrderServiceClient orderServiceClient) {
+                           ModelMapper mapper, OrderServiceClient orderServiceClient,
+                           CircuitBreakerFactory circuitBreakerFactory) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
         this.orderServiceClient = orderServiceClient;
+        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     @Override
@@ -65,17 +70,10 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = mapper.map(userEntity, UserDto.class);
 
-        // Using RestTemplate to get orders of user
-        /*
-        String orderUrl = String.format(Objects.requireNonNull(environment.getProperty("order_service.url")), userDto.getUserId());
-        List<OrderResponse> orderResponses =
-                restTemplate.exchange(orderUrl, HttpMethod.GET, null,
-                        new ParameterizedTypeReference<List<OrderResponse>>() {
-                        }).getBody();
-        */
-
         // Using FeignClient to get orders of user
-        List<OrderResponse> orderResponses = orderServiceClient.getOrders(userDto.getUserId());
+        CircuitBreaker circuitbreaker = circuitBreakerFactory.create("circuitbreaker");
+        List<OrderResponse> orderResponses = circuitbreaker.run(() -> orderServiceClient.getOrders(userId),
+                throwable -> new ArrayList<>());
         userDto.setOrderResponses(orderResponses);
 
         return userDto;

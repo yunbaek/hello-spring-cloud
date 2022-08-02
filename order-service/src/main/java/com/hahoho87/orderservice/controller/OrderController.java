@@ -44,16 +44,20 @@ public class OrderController {
         OrderDto orderDto = getMap(order, OrderDto.class);
         orderDto.setUserId(userId);
 
+        /* jpa */
+        OrderDto createOrder = orderService.createOrder(orderDto);
+        OrderResponse orderResponse = mapper.map(createOrder, OrderResponse.class);
+
         /* kafka */
-        orderDto.setOrderId(UUID.randomUUID().toString());
-        orderDto.setTotalPrice(this.getTotalPrice(orderDto));
+//        orderDto.setOrderId(UUID.randomUUID().toString());
+//        orderDto.setTotalPrice(this.getTotalPrice(orderDto));
 
         /* send order to the kafka */
-        kafkaProducer.send("example-catalog-topic", orderDto);
-        orderProducer.send("orders", orderDto);
+//        kafkaProducer.send("example-catalog-topic", orderDto);
+//        orderProducer.send("orders", orderDto);
+//        OrderResponse orderResponse = getMap(orderDto, OrderResponse.class);
 
-        OrderResponse result = getMap(orderDto, OrderResponse.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
 
     @GetMapping("/{userId}")
