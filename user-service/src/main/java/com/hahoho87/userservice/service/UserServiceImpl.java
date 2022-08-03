@@ -71,9 +71,11 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = mapper.map(userEntity, UserDto.class);
 
         // Using FeignClient to get orders of user
+        log.info("Before call order microservice");
         CircuitBreaker circuitbreaker = circuitBreakerFactory.create("circuitbreaker");
         List<OrderResponse> orderResponses = circuitbreaker.run(() -> orderServiceClient.getOrders(userId),
                 throwable -> new ArrayList<>());
+        log.info("After call order microservice");
         userDto.setOrderResponses(orderResponses);
 
         return userDto;

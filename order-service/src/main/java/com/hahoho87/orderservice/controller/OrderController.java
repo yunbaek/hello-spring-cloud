@@ -7,16 +7,17 @@ import com.hahoho87.orderservice.messagequeue.OrderProducer;
 import com.hahoho87.orderservice.service.OrderService;
 import com.hahoho87.orderservice.vo.OrderRequest;
 import com.hahoho87.orderservice.vo.OrderResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@Slf4j
 @RequestMapping("/order-service/orders")
 public class OrderController {
 
@@ -41,6 +42,7 @@ public class OrderController {
     @PostMapping("/{userId}")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest order,
                                                      @PathVariable String userId) {
+        log.info("Before add orders data");
         OrderDto orderDto = getMap(order, OrderDto.class);
         orderDto.setUserId(userId);
 
@@ -57,14 +59,25 @@ public class OrderController {
 //        orderProducer.send("orders", orderDto);
 //        OrderResponse orderResponse = getMap(orderDto, OrderResponse.class);
 
+        log.info("After add orders data");
         return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<OrderResponse>> getOrders(@PathVariable String userId) {
+        log.info("Before retrieve orders data");
         List<OrderEntity> orders = orderService.getOrdersByUserId(userId);
         List<OrderResponse> result = orders.stream().map(o -> getMap(o, OrderResponse.class))
                 .collect(Collectors.toList());
+
+        try {
+            Thread.sleep(1000);
+            throw new RuntimeException("Error");
+        } catch (InterruptedException e) {
+            log.warn(e.getMessage());
+        }
+
+        log.info("After retrieve orders data");
         return ResponseEntity.ok(result);
     }
 
