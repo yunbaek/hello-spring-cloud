@@ -45,3 +45,9 @@ logging:
 
 greeting:
   message: Welcome to the Simple E-commerce
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh, info, prometheus, metrics
