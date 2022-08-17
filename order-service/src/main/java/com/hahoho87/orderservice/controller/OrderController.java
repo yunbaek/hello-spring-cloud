@@ -70,6 +70,9 @@ public class OrderController {
         List<OrderResponse> result = orders.stream().map(o -> getMap(o, OrderResponse.class))
                 .collect(Collectors.toList());
 
+        orders.stream().map(o -> getMap(o, OrderResponse.class))
+                .collect(Collectors.toList());
+
         try {
             Thread.sleep(1000);
             throw new RuntimeException("Error");
